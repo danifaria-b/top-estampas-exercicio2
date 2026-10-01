@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Estampas - Prática Contábil</title>
+  <style>
+    :root {
+      --primary: #004a8f;
+      --secondary: #f68b20;
+      --light-bg: #f8f9fa;
+      --border: #cfd8dc;
+      --text: #263238;
+      --success: #2e7d32;
+      --danger: #c62828;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #eceff1; color: var(--text); padding: 20px; line-height: 1.5; }
+    .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; }
+    
+    .nav-prof { position: absolute; top: 20px; right: 25px; }
+    .btn-prof-access { background: #37474f; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+    .btn-prof-access:hover { background: #212121; }
+
+    h1 { color: var(--primary); font-size: 1.6rem; margin-bottom: 10px; }
+    h2 { color: var(--primary); font-size: 1.2rem; margin: 20px 0 10px; border-left: 4px solid var(--secondary); padding-left: 8px; }
+    
+    .screen { display: none; }
+    .screen.active { display: block; }
+    
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.95rem; }
+    input[type="text"], input[type="number"], select { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 1rem; }
+    
+    .btn { background: var(--secondary); color: white; border: none; padding: 12px; font-size: 1rem; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 10px; }
+    .btn:hover { background: #e07b19; }
+    .btn-primary { background: var(--primary); }
+    .btn-primary:hover { background: #003366; }
+    .btn-email { background: #d32f2f; }
+    .btn-email:hover { background: #b71c1c; }
+
+    .transaction-card { background: var(--light-bg); border-left: 4px solid var(--primary); padding: 12px; margin-bottom: 8px; border-radius: 4px; font-size: 0.9rem; }
+    .grid-razonetes { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px; margin-top: 15px; }
+    .t-card { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+    .t-title { background: var(--primary); color: white; text-align: center; padding: 8px; font-weight: bold; }
+    .t-header { display: flex; justify-content: space-between; background: #eceff1; padding: 4px 10px; font-size: 0.8rem; font-weight: bold; border-bottom: 2px solid #333; }
+    .t-body { display: flex; }
+    .t-side { flex: 1; padding: 8px; }
+    .t-side.debit { border-right: 2px solid #333; }
+    .t-row { display: flex; align-items: center; margin-bottom: 4px; }
+    .t-row span { font-size: 0.8rem; color: #555; width: 25px; }
+    .t-row input { text-align: right; padding: 4px; }
+    .t-footer { background: #fafafa; padding: 8px; border-top: 2px solid #333; }
+    .btn-calc { background: #607d8b; color: white; border: none; padding: 6px; width: 100%; border-radius: 3px; font-size: 0.8rem; cursor: pointer; margin-bottom: 6px; }
+    .saldo-display { display: flex; justify-content: space-between; font-weight: bold; font-size: 0.9rem; }
+    .saldo-display input { width: 110px; font-weight: bold; text-align: right; }
+
+    .eq-box { background: #e8f5e9; border: 1px solid var(--success); padding: 15px; border-radius: 6px; margin-top: 20px; text-align: center; }
+    .eq-fields { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    
+    .box-feedback { display: none; margin-top: 20px; padding: 20px; border-radius: 6px; text-align: center; }
+    .box-code { background: #fffde7; border: 1px solid #ffd54f; padding: 15px; border-radius: 6px; margin-top: 15px; text-align: left; }
+    textarea { width: 100%; height: 75px; margin-top: 8px; padding: 8px; font-family: monospace; font-size: 0.85rem; }
+
+    .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
+    .kpi-card { background: var(--light-bg); border-radius: 6px; padding: 15px; text-align: center; border-left: 4px solid var(--primary); }
+    .kpi-num { font-size: 1.8rem; font-weight: bold; color: var(--primary); }
+    .kpi-label { font-size: 0.85rem; color: #555; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+    th, td { border: 1px solid var(--border); padding: 10px; text-align: left; }
+    th { background: var(--primary); color: white; }
+    tr:nth-child(even) { background-color: #fbfbfb; }
+    .badge-correto { background: #e8f5e9; color: var(--success); font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+    .badge-erro { background: #ffebee; color: var(--danger); font-weight: bold; padding: 4px 8px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="nav-prof">
+    <button class="btn-prof-access" onclick="abrirModalProfessor()">Área da Professora 🔒</button>
+  </div>
+
+  <!-- TELA 1: ENTRADA -->
+  <div id="screen-login" class="screen active">
+    <h1>Top Estampas - Abertura da Atividade</h1>
+    <p>Preencha os seus dados de identificação para registrar a presença e acessar o exercício.</p>
+    
+    <div style="margin-top: 25px; max-width: 450px;">
+      <div class="form-group">
+        <label for="input-aluno">Nome Completo do Estudante:</label>
+        <input type="text" id="input-aluno" placeholder="Ex: Ana Clara Martins">
+      </div>
+      <div class="form-group">
+        <label for="select-turma">Turma:</label>
+        <select id="select-turma">
+          <option value="">Selecione a turma...</option>
+          <option value="2A">2º Ano A</option>
+          <option value="2B">2º Ano B</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="iniciarExercicio()">Registrar Presença e Iniciar</button>
+    </div>
+  </div>
+
+  <!-- TELA 2: EXERCÍCIO -->
+  <div id="screen-exercise" class="screen">
+    <div style="display:flex; justify-content:space-between; border-bottom:1px solid #ccc; padding-bottom:8px;">
+      <div><strong>Estudante:</strong> <span id="lbl-aluno"></span></div>
+      <div><strong>Turma:</strong> <span id="lbl-turma"></span> | <strong>Acesso:</strong> <span id="lbl-hora"></span></div>
+    </div>
+
+    <h2>Transações da Loja "Top Estampas"</h2>
+    <div class="transaction-card"><strong>(1) Abertura do Negócio:</strong> Os sócios investiram <strong>R$ 1.000,00</strong> em dinheiro vivo para iniciar a empresa (Abertura do Capital Social).</div>
+    <div class="transaction-card"><strong>(2) Compra de Equipamento:</strong> A empresa comprou uma máquina de estampar manual por <strong>R$ 300,00</strong>, paga à vista em dinheiro.</div>
+    <div class="transaction-card"><strong>(3) Compra de Matéria-Prima:</strong> A empresa comprou tecidos e tintas (Estoque) no valor de <strong>R$ 200,00</strong>, a prazo (Fornecedor).</div>
+    <div class="transaction-card"><strong>(4) Pagamento Parcial:</strong> A empresa usou dinheiro do caixa para pagar metade da dívida com o fornecedor (<strong>R$ 100,00</strong>).</div>
+
+    <h2>Razonetes em T</h2>
+    <div class="grid-razonetes">
+      
+      <!-- Caixa -->
+      <div class="t-card">
+        <div class="t-title">Caixa (Ativo)</div>
+        <div class="t-header"><span>DÉBITO (+)</span><span>CRÉDITO (-)</span></div>
+        <div class="t-body">
+          <div class="t-side debit">
+            <div class="t-row"><span>(1)</span><input type="number" id="cx-d1" placeholder="0"></div>
+            <div class="t-row"><span>( )</span><input type="number" id="cx-d2" placeholder="0"></div>
+          </div>
+          <div class="t-side credit">
+            <div class="t-row"><span>(2)</span><input type="number" id="cx-c1" placeholder="0"></div>
+            <div class="t-row"><span>(4)</span><input type="number" id="cx-c2" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="t-footer">
+          <button class="btn-calc" onclick="calcT('cx', 'ativo')">Calcular Saldo Final (D - C)</button>
+          <div class="saldo-display"><span>Saldo:</span><span>R$ <input type="number" id="cx-saldo" readonly></span></div>
+        </div>
+      </div>
+
+      <!-- Capital Social -->
+      <div class="t-card">
+        <div class="t-title">Capital Social (PL)</div>
+        <div class="t-header"><span>DÉBITO (-)</span><span>CRÉDITO (+)</span></div>
+        <div class="t-body">
+          <div class="t-side debit">
+            <div class="t-row"><span>( )</span><input type="number" id="pl-d1" placeholder="0"></div>
+          </div>
+          <div class="t-side credit">
+            <div class="t-row"><span>(1)</span><input type="number" id="pl-c1" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="t-footer">
+          <button class="btn-calc" onclick="calcT('pl', 'passivo')">Calcular Saldo Final (C - D)</button>
+          <div class="saldo-display"><span>Saldo:</span><span>R$ <input type="number" id="pl-saldo" readonly></span></div>
+        </div>
+      </div>
+
+      <!-- Equipamentos e Estoques -->
+      <div class="t-card">
+        <div class="t-title">Equipamentos / Estoques (Ativo)</div>
+        <div class="t-header"><span>DÉBITO (+)</span><span>CRÉDITO (-)</span></div>
+        <div class="t-body">
+          <div class="t-side debit">
+            <div class="t-row"><span>(2)</span><input type="number" id="eq-d1" placeholder="0"></div>
+            <div class="t-row"><span>(3)</span><input type="number" id="eq-d2" placeholder="0"></div>
+          </div>
+          <div class="t-side credit">
+            <div class="t-row"><span>( )</span><input type="number" id="eq-c1" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="t-footer">
+          <button class="btn-calc" onclick="calcT('eq', 'ativo')">Calcular Saldo Final (D - C)</button>
+          <div class="saldo-display"><span>Saldo:</span><span>R$ <input type="number" id="eq-saldo" readonly></span></div>
+        </div>
+      </div>
+
+      <!-- Fornecedores -->
+      <div class="t-card">
+        <div class="t-title">Fornecedores (Passivo)</div>
+        <div class="t-header"><span>DÉBITO (-)</span><span>CRÉDITO (+)</span></div>
+        <div class="t-body">
+          <div class="t-side debit">
+            <div class="t-row"><span>(4)</span><input type="number" id="fn-d1" placeholder="0"></div>
+          </div>
+          <div class="t-side credit">
+            <div class="t-row"><span>(3)</span><input type="number" id="fn-c1" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="t-footer">
+          <button class="btn-calc" onclick="calcT('fn', 'passivo')">Calcular Saldo Final (C - D)</button>
+          <div class="saldo-display"><span>Saldo:</span><span>R$ <input type="number" id="fn-saldo" readonly></span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Equação Fundamental -->
+    <div class="eq-box">
+      <strong>Equação Fundamental do Patrimônio</strong>
+      <p style="font-size:0.85rem; margin-top:4px;">Preencha os valores consolidados finais:</p>
+      <div class="eq-fields">
+        <div><label>Total Ativo</label><input type="number" id="total-ativo" style="width:110px;"></div>
+        <span style="font-size:1.4rem; font-weight:bold; margin-top:20px;">=</span>
+        <div><label>Total Passivo</label><input type="number" id="total-passivo" style="width:110px;"></div>
+        <span style="font-size:1.4rem; font-weight:bold; margin-top:20px;">+</span>
+        <div><label>Total PL</label><input type="number" id="total-pl" style="width:110px;"></div>
+      </div>
+    </div>
+
+    <button class="btn" onclick="finalizarAtividade()">Validar Respostas e Gerar Código</button>
+
+    <!-- ÁREA DE CONFIRMAÇÃO DO ALUNO -->
+    <div id="aluno-feedback" class="box-feedback">
+      <h3 id="feedback-titulo"></h3>
+      <p id="feedback-desc" style="margin-top:5px;"></p>
+      
+      <div class="box-code">
+        <strong>Código de Validação da Entrega:</strong>
+        <p style="font-size:0.85rem; color:#555;">Clique no botão vermelho para enviar diretamente para a professora por e-mail:</p>
+        <textarea id="codigo-entrega" readonly></textarea>
+        <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+          <button class="btn btn-email" style="flex:2;" onclick="enviarPorEmail()">Enviar Direto por E-mail para a Professora ✉️</button>
+          <button class="btn" style="background:#546e7a; flex:1;" onclick="copiarCodigo()">Copiar Código</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA 3: DASHBOARD DA PROFESSORA -->
+  <div id="screen-dashboard" class="screen">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h1>Painel de Acompanhamento da Turma</h1>
+      <button class="btn-prof-access" onclick="fecharDashboard()">Voltar à Atividade</button>
+    </div>
+
+    <!-- Indicadores -->
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-num" id="kpi-total">0</div>
+        <div class="kpi-label">Total de Alunos Registrados</div>
+      </div>
+      <div class="kpi-card" style="border-left-color: var(--success);">
+        <div class="kpi-num" style="color:var(--success)" id="kpi-acertos">0</div>
+        <div class="kpi-label">Atividades 100% Corretas</div>
+      </div>
+      <div class="kpi-card" style="border-left-color: var(--danger);">
+        <div class="kpi-num" style="color:var(--danger)" id="kpi-erros">0</div>
+        <div class="kpi-label">Necessitam de Revisão</div>
+      </div>
+    </div>
+
+    <!-- Importação de Códigos do E-mail -->
+    <div style="background:#eceff1; padding:18px; border-radius:6px; margin-bottom:20px; border-left:4px solid var(--primary);">
+      <strong>Lançar Aluno na Pauta (Código do E-mail):</strong>
+      <p style="font-size:0.85rem; color:#555; margin-top:3px;">Cole o código recebido no e-mail do aluno para atualizar a pauta instantaneamente:</p>
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <input type="text" id="input-import-code" placeholder="Cole o código aqui (Ex.: REG#...)">
+        <button class="btn-prof-access" style="background:var(--primary); white-space:nowrap; padding:0 20px;" onclick="importarCodigoAluno()">Registrar na Pauta</button>
+      </div>
+    </div>
+
+    <!-- Tabela Geral -->
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2>Lista de Presença e Resultados</h2>
+      <button onclick="limparRegistros()" style="background:none; border:none; color:var(--danger); cursor:pointer; font-size:0.85rem; text-decoration:underline;">Limpar Pauta</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Horário</th>
+          <th>Nome do Estudante</th>
+          <th>Turma</th>
+          <th>Situação</th>
+          <th>Saldos Apurados</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-registros">
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  const EMAIL_PROFESSORA = "danifariabsenac@gmail.com";
+
+  let alunoAtual = {};
+  let codigoSeguro = "";
+
+  function iniciarExercicio() {
+    const nome = document.getElementById('input-aluno').value.trim();
+    const turma = document.getElementById('select-turma').value;
+
+    if (!nome || !turma) {
+      alert("Por favor, preencha o Nome Completo e selecione a Turma.");
+      return;
+    }
+
+    alunoAtual = {
+      nome: nome,
+      turma: turma,
+      hora: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})
+    };
+
+    document.getElementById('lbl-aluno').innerText = alunoAtual.nome;
+    document.getElementById('lbl-turma').innerText = alunoAtual.turma;
+    document.getElementById('lbl-hora').innerText = alunoAtual.hora;
+
+    document.getElementById('screen-login').classList.remove('active');
+    document.getElementById('screen-exercise').classList.add('active');
+  }
+
+  function calcT(prefix, tipo) {
+    let d1 = Number(document.getElementById(`${prefix}-d1`)?.value) || 0;
+    let d2 = Number(document.getElementById(`${prefix}-d2`)?.value) || 0;
+    let c1 = Number(document.getElementById(`${prefix}-c1`)?.value) || 0;
+    let c2 = Number(document.getElementById(`${prefix}-c2`)?.value) || 0;
+
+    let somaD = d1 + d2;
+    let somaC = c1 + c2;
+    let saldo = (tipo === 'ativo') ? (somaD - somaC) : (somaC - somaD);
+
+    document.getElementById(`${prefix}-saldo`).value = saldo;
+  }
+
+  function finalizarAtividade() {
+    const cx = Number(document.getElementById('cx-saldo').value) || 0;
+    const pl = Number(document.getElementById('pl-saldo').value) || 0;
+    const eq = Number(document.getElementById('eq-saldo').value) || 0;
+    const fn = Number(document.getElementById('fn-saldo').value) || 0;
+
+    const atv = Number(document.getElementById('total-ativo').value) || 0;
+    const pas = Number(document.getElementById('total-passivo').value) || 0;
+    const pat = Number(document.getElementById('total-pl').value) || 0;
+
+    // Gabarito Oficial:
+    // Caixa = 600 | PL = 1000 | Equip = 500 | Fornec = 100
+    // Ativo (1100) = Passivo (100) + PL (1000)
+    const razonetesOk = (cx === 600 && pl === 1000 && eq === 500 && fn === 100);
+    const equacaoOk = (atv === 1100 && pas === 100 && pat === 1000);
+
+    const acertou = (razonetesOk && equacaoOk);
+    const statusTexto = acertou ? "Correto" : "Incorreto";
+    const detalhes = `Cx:${cx} | PL:${pl} | Eq:${eq} | Fn:${fn} | Eq:${atv}=${pas}+${pat}`;
+
+    const registro = {
+      hora: alunoAtual.hora,
+      nome: alunoAtual.nome,
+      turma: alunoAtual.turma,
+      status: statusTexto,
+      detalhes: detalhes
+    };
+
+    codigoSeguro = "REG#" + encodeURIComponent(alunoAtual.nome) + "#" + alunoAtual.turma + "#" + alunoAtual.hora + "#" + statusTexto + "#" + detalhes;
+
+    const boxFeedback = document.getElementById('aluno-feedback');
+    const titulo = document.getElementById('feedback-titulo');
+    const desc = document.getElementById('feedback-desc');
+
+    boxFeedback.style.display = 'block';
+    if (acertou) {
+      boxFeedback.style.background = "#e8f5e9";
+      boxFeedback.style.border = "2px solid var(--success)";
+      titulo.innerText = "Parabéns! Exercício 100% Correto!";
+      titulo.style.color = "var(--success)";
+      desc.innerText = "Todos os razonetes e a Equação Fundamental estão perfeitamente apurados.";
+    } else {
+      boxFeedback.style.background = "#ffebee";
+      boxFeedback.style.border = "2px solid var(--danger)";
+      titulo.innerText = "Atenção: Exercício Incompleto ou com Erros";
+      titulo.style.color = "var(--danger)";
+      desc.innerText = "Verifique os cálculos de débito/crédito nos razonetes e a soma da Equação Fundamental.";
+    }
+
+    document.getElementById('codigo-entrega').value = codigoSeguro;
+    boxFeedback.scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function enviarPorEmail() {
+    if (!codigoSeguro) {
+      alert("Por favor, clique primeiro em 'Validar Respostas e Gerar Código'.");
+      return;
+    }
+    const assunto = encodeURIComponent(`Atividade Top Estampas - ${alunoAtual.nome} (Turma ${alunoAtual.turma})`);
+    const corpo = encodeURIComponent(
+      `Olá Professora,
+
+Segue o código de entrega da atividade prática da Top Estampas:
+
+` +
+      `Estudante: ${alunoAtual.nome}
+` +
+      `Turma: ${alunoAtual.turma}
+` +
+      `Horário de Registro: ${alunoAtual.hora}
+
+` +
+      `CÓDIGO DE LANÇAMENTO NA PAUTA:
+` +
+      `${codigoSeguro}
+
+` +
+      `Atenciosamente,
+${alunoAtual.nome}`
+    );
+
+    window.location.href = `mailto:${EMAIL_PROFESSORA}?subject=${assunto}&body=${corpo}`;
+  }
+
+  function copiarCodigo() {
+    const txt = document.getElementById('codigo-entrega');
+    txt.select();
+    navigator.clipboard.writeText(txt.value);
+    alert("Código copiado com sucesso!");
+  }
+
+  function abrirModalProfessor() {
+    const senha = prompt("Digite a senha de acesso da professora:");
+    if (senha === "senac2026") {
+      carregarDashboard();
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById('screen-dashboard').classList.add('active');
+    } else if (senha !== null) {
+      alert("Senha incorreta!");
+    }
+  }
+
+  function fecharDashboard() {
+    document.getElementById('screen-dashboard').classList.remove('active');
+    document.getElementById('screen-login').classList.add('active');
+  }
+
+  function salvarRegistroLocal(registro) {
+    let registros = JSON.parse(localStorage.getItem('bd_top_estampas_v2') || '[]');
+    const idx = registros.findIndex(r => r.nome.toLowerCase() === registro.nome.toLowerCase() && r.turma === registro.turma);
+    if (idx >= 0) {
+      registros[idx] = registro;
+    } else {
+      registros.push(registro);
+    }
+    localStorage.setItem('bd_top_estampas_v2', JSON.stringify(registros));
+  }
+
+  function carregarDashboard() {
+    const registros = JSON.parse(localStorage.getItem('bd_top_estampas_v2') || '[]');
+    const tbody = document.getElementById('tabela-registros');
+    tbody.innerHTML = '';
+
+    let total = registros.length;
+    let acertos = 0;
+
+    registros.forEach(r => {
+      if (r.status === 'Correto') acertos++;
+      const tr = document.createElement('tr');
+      const badge = r.status === 'Correto' ? '<span class="badge-correto">100% Correto</span>' : '<span class="badge-erro">Revisão Necessária</span>';
+      tr.innerHTML = `
+        <td>${r.hora}</td>
+        <td><strong>${r.nome}</strong></td>
+        <td>Turma ${r.turma}</td>
+        <td>${badge}</td>
+        <td style="font-family:monospace; font-size:0.8rem;">${r.detalhes}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('kpi-total').innerText = total;
+    document.getElementById('kpi-acertos').innerText = acertos;
+    document.getElementById('kpi-erros').innerText = (total - acertos);
+
+    if (total === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Nenhum registro de estudante lançado na pauta até ao momento.</td></tr>';
+    }
+  }
+
+  function importarCodigoAluno() {
+    const input = document.getElementById('input-import-code');
+    const codigo = input.value.trim();
+    if (!codigo) return;
+
+    if (!codigo.startsWith("REG#")) {
+      alert("Código inválido! O código de lançamento deve começar por 'REG#'.");
+      return;
+    }
+
+    try {
+      const partes = codigo.split("#");
+      const reg = {
+        nome: decodeURIComponent(partes[1]),
+        turma: partes[2],
+        hora: partes[3],
+        status: partes[4],
+        detalhes: partes[5]
+      };
+
+      salvarRegistroLocal(reg);
+      carregarDashboard();
+      input.value = '';
+      alert(`Estudante ${reg.nome} (Turma ${reg.turma}) registrado(a) na pauta com sucesso!`);
+    } catch(e) {
+      alert("Ocorreu um erro ao processar o código. Verifique se copiou a linha na totalidade.");
+    }
+  }
+
+  function limparRegistros() {
+    if (confirm("Tem certeza que deseja limpar todos os registros guardados na pauta?")) {
+      localStorage.removeItem('bd_top_estampas_v2');
+      carregarDashboard();
+    }
+  }
+</script>
+
+</body>
+</html>
